@@ -15,10 +15,6 @@ namespace Depra.Logging.UnitTests
 		public void Setup()
 		{
 			_logChannel = new ConsoleLogChannel("test");
-
-			var format = new DefaultLogFormat()
-				.WithPrefix(entry => entry.Level.ToString())
-				.Build();
 		}
 
 		[Test]
