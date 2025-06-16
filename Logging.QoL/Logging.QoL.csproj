@@ -1,15 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
-        <AssemblyName>Depra.Logging</AssemblyName>
-        <RootNamespace>Depra.Logging</RootNamespace>
         <LangVersion>9</LangVersion>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Depra.Logging.QoL</RootNamespace>
+        <AssemblyName>Depra.Logging.QoL</AssemblyName>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
       <Optimize>true</Optimize>
       <DebugType>embedded</DebugType>
     </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Logging\Logging.csproj" />
+    </ItemGroup>
 
 </Project>
