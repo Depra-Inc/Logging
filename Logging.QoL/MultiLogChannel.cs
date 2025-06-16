@@ -1,7 +1,9 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023-2025 Depra <n.melnikov@depra.org>
 
-namespace Depra.Logging
+using System;
+
+namespace Depra.Logging.QoL
 {
 	public sealed class MultiLogChannel : ILogChannel
 	{
@@ -22,6 +24,14 @@ namespace Depra.Logging
 			foreach (var channel in _channels)
 			{
 				channel.Log(message, level, args);
+			}
+		}
+
+		void ILogChannel.Log(Exception exception)
+		{
+			foreach (var channel in _channels)
+			{
+				channel.Log(exception);
 			}
 		}
 	}

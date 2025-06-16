@@ -13,6 +13,8 @@ namespace Depra.Logging
 		void ILogChannel.Log(string message, LogLevel level, params object[] args) =>
 			throw new NullLogChannelException();
 
+		void ILogChannel.Log(Exception exception) => throw new NullLogChannelException();
+
 		private sealed class NullLogChannelException : Exception
 		{
 			public NullLogChannelException() : base($"{nameof(NullLogChannel)} does not support this operation.") { }

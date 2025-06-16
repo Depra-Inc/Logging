@@ -1,6 +1,7 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023-2025 Depra <n.melnikov@depra.org>
 
+using System;
 using System.Diagnostics;
 
 namespace Depra.Logging
@@ -17,6 +18,17 @@ namespace Depra.Logging
 			}
 
 			Log(string.Format(message, args), level);
+		}
+
+		void ILogChannel.Log(Exception exception)
+		{
+			if (exception == null)
+			{
+				throw new ArgumentNullException(nameof(exception), "Exception cannot be null.");
+			}
+
+			var message = $"{exception.GetType().Name}: {exception.Message}\n{exception.StackTrace}";
+			Trace.WriteLine(message, category: "Exception");
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
 // © 2023-2025 Depra <n.melnikov@depra.org>
 
+using System;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -8,7 +9,7 @@ namespace Depra.Logging
 {
 	public sealed class Logger : ILogChannel
 	{
-		private static readonly string[] LOG_LEVEL_NAMES = { "info:", "warn:", "assert:", "error:", "fatal:" };
+		private static readonly string[] LOG_LEVEL_NAMES = { "info:", "warn:", "assert:", "error:", "exception:" };
 		private static StringBuilder _stringBuilder;
 
 		private readonly string _channelId;
@@ -22,6 +23,9 @@ namespace Depra.Logging
 
 		public Logger Channel(string channelId) => new(_master,
 			string.IsNullOrEmpty(_channelId) ? channelId : $"{_channelId}:{channelId}");
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void Log(Exception exception) => _master.Log(exception);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Log(string message, LogLevel level) => _master.Log(

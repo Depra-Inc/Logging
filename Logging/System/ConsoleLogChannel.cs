@@ -7,10 +7,6 @@ namespace Depra.Logging
 {
 	public sealed class ConsoleLogChannel : ILogChannel
 	{
-		private readonly string _tag;
-
-		public ConsoleLogChannel(string tag) => _tag = tag;
-
 		public void Log(LogEntry entry)
 		{
 			var prefix = entry.Level.ToString().ToUpperInvariant() + ": ";
@@ -28,5 +24,21 @@ namespace Depra.Logging
 		void ILogChannel.Log(string message, LogLevel level) => Console.WriteLine(message);
 
 		void ILogChannel.Log(string message, LogLevel level, params object[] args) => Console.WriteLine(message, args);
+
+		void ILogChannel.Log(Exception exception)
+		{
+			if (exception == null)
+			{
+				throw new ArgumentNullException(nameof(exception), "Exception cannot be null.");
+			}
+
+			var message = $"Exception: {exception.Message}";
+			if (exception.StackTrace != null)
+			{
+				message += Environment.NewLine + exception.StackTrace;
+			}
+
+			Console.WriteLine(message);
+		}
 	}
 }

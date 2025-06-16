@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using Depra.Logging.IO;
+using FluentAssertions;
+using NUnit.Framework;
 
 namespace Depra.Logging.UnitTests;
 
@@ -30,6 +32,7 @@ internal sealed class FileSystemLogChannelTests
 		const LogLevel LOG_LEVEL = LogLevel.INFO;
 
 		// Act:
+		_logChannel.As<ILogChannel>().Log("4324{0}", LOG_LEVEL, "message");
 		_logChannel.Log(MESSAGE, LOG_LEVEL);
 
 		// Assert:

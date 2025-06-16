@@ -27,11 +27,6 @@ namespace Depra.Logging
         /// <summary>
         /// <see cref="LogLevel"/> used for Errors.
         /// </summary>
-        ERROR,
-        
-        /// <summary>
-        /// Things will not recover, bring up pop up dialog.
-        /// </summary>
-        FATAL_ERROR,
+        ERROR
     }
 }

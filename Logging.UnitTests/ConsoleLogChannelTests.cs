@@ -1,5 +1,5 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
-// © 2023-2024 Nikolay Melnikov <n.melnikov@depra.org>
+// © 2023-2025 Depra <n.melnikov@depra.org>
 
 using FluentAssertions;
 using NUnit.Framework;
@@ -12,113 +12,33 @@ namespace Depra.Logging.UnitTests
 		private ILogChannel _logChannel;
 
 		[SetUp]
-		public void Setup()
-		{
-			_logChannel = new ConsoleLogChannel("test");
-		}
+		public void Setup() => _logChannel = new ConsoleLogChannel();
 
 		[Test]
-		public void WhenLoggingInfo_AndWithoutArgs_ThenNoExceptionIsThrown()
+		[TestCase("info message", LogLevel.INFO)]
+		[TestCase("error message", LogLevel.ERROR)]
+		[TestCase("assert message", LogLevel.ASSERT)]
+		[TestCase("warning message", LogLevel.WARNING)]
+		public void Log_WithoutArgs_ThenNoExceptionIsThrown(string message, LogLevel level)
 		{
-			// Arrange.
-			const string MESSAGE = "123";
+			// Act:
+			var act = () => _logChannel.Log(message, level);
 
-			// Act.
-			var act = () => _logChannel.Info(MESSAGE);
-
-			// Assert.
+			// Assert:
 			act.Should().NotThrow();
 		}
 
 		[Test]
-		public void WhenLoggingInfo_AndWithArgs_ThenNoExceptionIsThrown()
+		[TestCase("{0} {1}", LogLevel.INFO, new object[] { 1, nameof(Log_WithArgs_ThenNoExceptionIsThrown) })]
+		[TestCase("{0} {1}", LogLevel.ERROR, new object[] { 1, nameof(Log_WithArgs_ThenNoExceptionIsThrown) })]
+		[TestCase("{0} {1}", LogLevel.ASSERT, new object[] { 1, nameof(Log_WithArgs_ThenNoExceptionIsThrown) })]
+		[TestCase("{0} {1}", LogLevel.WARNING, new object[] { 1, nameof(Log_WithArgs_ThenNoExceptionIsThrown) })]
+		public void Log_WithArgs_ThenNoExceptionIsThrown(string message, LogLevel level, object[] args)
 		{
-			// Arrange.
-			const string MESSAGE = "{0} {1}";
-			var args = new object[] { 1, nameof(WhenLoggingInfo_AndWithArgs_ThenNoExceptionIsThrown) };
+			// Act:
+			var act = () => _logChannel.Log(message, level, args);
 
-			// Act.
-			var act = () => _logChannel.Info(MESSAGE, args);
-
-			act.Should().NotThrow();
-		}
-
-		[Test]
-		public void WhenLoggingWarning_AndWithoutArgs_ThenNoExceptionIsThrown()
-		{
-			// Arrange.
-			const string MESSAGE = "123";
-
-			// Act.
-			var act = () => _logChannel.Warning(MESSAGE);
-
-			// Assert.
-			act.Should().NotThrow();
-		}
-
-		[Test]
-		public void WhenLoggingWarning_AndWithArgs_ThenNoExceptionIsThrown()
-		{
-			// Arrange.
-			const string MESSAGE = "{0} {1}";
-			var args = new object[] { 1, nameof(WhenLoggingWarning_AndWithArgs_ThenNoExceptionIsThrown) };
-
-			// Act.
-			var act = () => _logChannel.Warning(MESSAGE, args);
-
-			act.Should().NotThrow();
-		}
-
-		[Test]
-		public void WhenLoggingAssert_AndWithoutArgs_ThenNoExceptionIsThrown()
-		{
-			// Arrange.
-			const string MESSAGE = "123";
-
-			// Act.
-			var act = () => _logChannel.Assert(MESSAGE);
-
-			// Assert.
-			act.Should().NotThrow();
-		}
-
-		[Test]
-		public void WhenLoggingAssert_AndWithArgs_ThenNoExceptionIsThrown()
-		{
-			// Arrange.
-			const string MESSAGE = "{0} {1}";
-			var args = new object[] { 1, nameof(WhenLoggingAssert_AndWithArgs_ThenNoExceptionIsThrown) };
-
-			// Act.
-			var act = () => _logChannel.Assert(MESSAGE, args);
-
-			act.Should().NotThrow();
-		}
-
-		[Test]
-		public void WhenLoggingException_AndWithoutArgs_ThenNoExceptionIsThrown()
-		{
-			// Arrange.
-			const string MESSAGE = "123";
-
-			// Act.
-			var act = () => _logChannel.Error(MESSAGE);
-
-			// Assert.
-			act.Should().NotThrow();
-		}
-
-		[Test]
-		public void WhenLoggingException_AndWithArgs_ThenNoExceptionIsThrown()
-		{
-			// Arrange.
-			const string MESSAGE = "{0} {1}";
-			var args = new object[] { 1, nameof(WhenLoggingException_AndWithArgs_ThenNoExceptionIsThrown) };
-
-			// Act.
-			var act = () => _logChannel.Error(MESSAGE, args);
-
-			// Assert.
+			// Assert:
 			act.Should().NotThrow();
 		}
 	}
