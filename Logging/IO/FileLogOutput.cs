@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
-// © 2023-2025 Depra <n.melnikov@depra.org>
+// © 2023-2026 Depra <n.melnikov@depra.org>
 
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace Depra.Logging.IO
 {
@@ -13,7 +12,6 @@ namespace Depra.Logging.IO
 		private static readonly string[] LEVEL_NAMES = { "DEBUG", "INFO", "WARNING", "ERROR" };
 
 		private readonly StreamWriter _writer;
-		private readonly StringBuilder _sb = new();
 		private readonly bool _streaming;
 		private readonly int _batchSize;
 		private int _pendingCount;
@@ -27,32 +25,18 @@ namespace Depra.Logging.IO
 
 		void ILogOutput.Write(LogLevel level, string message)
 		{
-			_sb.Clear();
-			AppendHeader(level);
-			_sb.Append(message);
-			_writer.WriteLine(_sb.ToString());
-
-			_pendingCount++;
-			if (_streaming || _pendingCount >= _batchSize)
-			{
-				Flush();
-			}
+			WriteHeader(level);
+			_writer.WriteLine(message);
+			OnWritten();
 		}
 
 		void ILogOutput.Write(Exception exception)
 		{
-			_sb.Clear();
-			AppendHeader(LogLevel.ERROR);
-			_sb.Append(exception.GetType().Name);
-			_sb.Append(": ");
-			_sb.Append(exception.Message);
-			_writer.WriteLine(_sb.ToString());
-
-			_pendingCount++;
-			if (_streaming || _pendingCount >= _batchSize)
-			{
-				Flush();
-			}
+			WriteHeader(LogLevel.ERROR);
+			_writer.Write(exception.GetType().Name);
+			_writer.Write(": ");
+			_writer.WriteLine(exception.Message);
+			OnWritten();
 		}
 
 		public void Flush()
@@ -67,24 +51,37 @@ namespace Depra.Logging.IO
 			_writer.Dispose();
 		}
 
-		private void AppendHeader(LogLevel level)
+		private void WriteHeader(LogLevel level)
 		{
+			Span<char> buffer = stackalloc char[20];
+			var position = 0;
 			var now = DateTime.Now;
-			AppendTwoDigits(now.Hour);
-			_sb.Append(':');
-			AppendTwoDigits(now.Minute);
-			_sb.Append(':');
-			AppendTwoDigits(now.Second);
-			_sb.Append(' ');
-			_sb.Append(LEVEL_NAMES[(int)level]);
-			_sb.Append(' ');
+
+			buffer[position++] = (char)('0' + now.Hour / 10);
+			buffer[position++] = (char)('0' + now.Hour % 10);
+			buffer[position++] = ':';
+			buffer[position++] = (char)('0' + now.Minute / 10);
+			buffer[position++] = (char)('0' + now.Minute % 10);
+			buffer[position++] = ':';
+			buffer[position++] = (char)('0' + now.Second / 10);
+			buffer[position++] = (char)('0' + now.Second % 10);
+			buffer[position++] = ' ';
+
+			var levelName = LEVEL_NAMES[(int)level].AsSpan();
+			levelName.CopyTo(buffer[position..]);
+			position += levelName.Length;
+			buffer[position++] = ' ';
+
+			_writer.Write(buffer[..position]);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void AppendTwoDigits(int value)
+		private void OnWritten()
 		{
-			_sb.Append((char)('0' + value / 10));
-			_sb.Append((char)('0' + value % 10));
+			if (++_pendingCount >= _batchSize || _streaming)
+			{
+				Flush();
+			}
 		}
 	}
 }

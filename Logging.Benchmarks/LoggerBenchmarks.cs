@@ -20,6 +20,7 @@ public class LoggerBenchmarks
 		_output = new FileLogOutput(_path, streaming: true);
 		_logger = new LoggerBuilder()
 			.AddOutput(new FakeOutput())
+			.AddOutput(_output)
 			.Build();
 		_channelLogger = _logger
 			.Channel("Network")
@@ -30,7 +31,6 @@ public class LoggerBenchmarks
 	public void Cleanup()
 	{
 		_output.Dispose();
-
 		if (File.Exists(_path))
 		{
 			File.Delete(_path);
