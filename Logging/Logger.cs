@@ -11,18 +11,36 @@ namespace Depra.Logging
 {
 	public class Logger
 	{
+		private static readonly StringBuilder BUILDER = new();
+
+		private readonly Logger _root;
 		private readonly string[] _tags;
-		private readonly LogLevel _minLevel;
-		private readonly StringBuilder _sb = new();
 		private readonly List<ILogOutput> _outputs;
+		private LogLevel _minLevel = LogLevel.ERROR;
 
-		public Logger(LogLevel minLevel) : this(minLevel, Array.Empty<string>(), new List<ILogOutput>()) { }
+		public Logger() : this(Array.Empty<string>(), new List<ILogOutput>()) { }
 
-		internal Logger(LogLevel level, string[] tags, List<ILogOutput> outputs)
+		internal Logger(string[] tags, List<ILogOutput> outputs, Logger root = null)
 		{
+			_root = root;
 			_tags = tags;
-			_minLevel = level;
 			_outputs = outputs;
+		}
+
+		public LogLevel MinLevel
+		{
+			get => _root?._minLevel ?? _minLevel;
+			set
+			{
+				if (_root != null)
+				{
+					_root._minLevel = value;
+				}
+				else
+				{
+					_minLevel = value;
+				}
+			}
 		}
 
 		public Logger Channel(string tag)
@@ -31,7 +49,7 @@ namespace Depra.Logging
 			Array.Copy(_tags, next, _tags.Length);
 			next[_tags.Length] = tag;
 
-			return new Logger(_minLevel, next, _outputs);
+			return new Logger(next, _outputs, _root ?? this);
 		}
 
 		[StringFormatMethod(nameof(format))]
@@ -42,14 +60,14 @@ namespace Depra.Logging
 				return;
 			}
 
-			_sb.Clear();
+			BUILDER.Clear();
 			AppendTags();
 			if (args != null)
 			{
-				_sb.AppendFormat(format, args);
+				BUILDER.AppendFormat(format, args);
 			}
 
-			var message = _sb.ToString();
+			var message = BUILDER.ToString();
 			foreach (var output in _outputs)
 			{
 				output.Write(level, message);
@@ -82,12 +100,12 @@ namespace Depra.Logging
 		{
 			foreach (var tag in _tags)
 			{
-				_sb.Append('[').Append(tag).Append(']');
+				BUILDER.Append('[').Append(tag).Append(']');
 			}
 
 			if (_tags.Length > 0)
 			{
-				_sb.Append(' ');
+				BUILDER.Append(' ');
 			}
 		}
 	}

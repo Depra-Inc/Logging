@@ -23,6 +23,14 @@ namespace Depra.Logging
 			return this;
 		}
 
-		public Logger Build() => new(_minLevel, Array.Empty<string>(), _outputs);
+		public Logger Build()
+		{
+			var logger = new Logger(Array.Empty<string>(), _outputs)
+			{
+				MinLevel = _minLevel
+			};
+
+			return logger;
+		}
 	}
 }
