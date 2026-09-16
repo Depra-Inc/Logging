@@ -2,13 +2,9 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-
         <IsPackable>false</IsPackable>
-
         <AssemblyName>Depra.Logging.UnitTests</AssemblyName>
-
         <RootNamespace>Depra.Logging.UnitTests</RootNamespace>
-
         <LangVersion>default</LangVersion>
     </PropertyGroup>
 
